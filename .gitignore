@@ -25,3 +25,5 @@ DerivedData
 #
 # Pods/
 
+# Carthage
+Carthage/Build
