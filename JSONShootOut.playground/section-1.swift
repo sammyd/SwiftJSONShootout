@@ -9,8 +9,9 @@ let rawJSON = NSData(contentsOfFile: jsonURL!)
 let json: AnyObject? = NSJSONSerialization.JSONObjectWithData(rawJSON!,
                                             options: .allZeros, error: nil)
 
+
 //-------------//
-// MARK:- ARGO
+// MARK:- Model
 //-------------//
 
 struct Repo {
@@ -21,6 +22,30 @@ struct Repo {
   let homepage: NSURL?
   let fork: Bool
 }
+
+//--------------------//
+// MARK:- valueForKey
+//--------------------//
+
+
+
+//----------------------//
+// MARK:- Optional Tree
+//----------------------//
+
+
+
+//-------------------//
+// MARK:- SwiftyJSON
+//-------------------//
+
+
+
+//-------------//
+// MARK:- ARGO
+//-------------//
+
+
 
 extension NSURL: JSONDecodable {
   public class func decode(j: JSONValue) -> NSURL? {
