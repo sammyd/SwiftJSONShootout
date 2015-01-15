@@ -1,6 +1,8 @@
 
 
+
 import Cocoa
+import SwiftyJSON
 
 /* Import the JSON from a file */
 let jsonURL = NSBundle.mainBundle().pathForResource("sams_repos", ofType: "json")
@@ -22,13 +24,7 @@ struct Repo {
   let fork: Bool
 }
 
+//-------------------//
+// MARK:- SwiftyJSON
+//-------------------//
 
-//--------------------//
-// MARK:- valueForKey
-//--------------------//
-
-
-
-//----------------------//
-// MARK:- Optional Tree
-//----------------------//
