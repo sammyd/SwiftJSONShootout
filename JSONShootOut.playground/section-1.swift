@@ -1,5 +1,6 @@
 import Cocoa
 import Foundation
+import SwiftyJSON
 import Argo
 import Runes
 

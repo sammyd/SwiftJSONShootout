@@ -1,2 +1,3 @@
-github "thoughtbot/runes" "v1.0"
-github "thoughtbot/Argo" "v0.3.1"
+github "SwiftyJSON/SwiftyJSON" "2.1.3"
+github "thoughtbot/runes" "v1.1"
+github "thoughtbot/Argo" "v0.3.2"
