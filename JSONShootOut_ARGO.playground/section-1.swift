@@ -25,6 +25,12 @@ struct Repo {
   let fork: Bool
 }
 
+extension Repo: Printable {
+  var description : String {
+    return "\(name) (\(id)) {\(desc) :: \(homepage)}"
+  }
+}
+
 
 
 //-------------//
@@ -57,12 +63,6 @@ extension Repo: JSONDecodable {
       <*> j <|  "url"
       <*> j <|? "homepage"
       <*> j <|  "fork"
-  }
-}
-
-extension Repo: Printable {
-  var description : String {
-    return "\(name) (\(id)) {\(desc) :: \(homepage)}"
   }
 }
 
