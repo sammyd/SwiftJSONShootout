@@ -66,19 +66,10 @@ extension Repo: JSONDecodable {
   }
 }
 
-var repos : [Repo?]? = .None
 
-if let j: AnyObject = json {
-  if let value = JSONValue.parse <^> j {
-    switch value {
-    case .JSONArray(let a):
-      repos = a.map(Repo.decode)
-    default:
-      println("Not an array")
-    }
-  }
-}
+// This line represents the confusion surrounding functional programming
+let repos: [Repo]? = (JSONValue.parse <^> json) >>- JSONValue.mapDecode
 
-repos
-
+// Unwrap two levels of optionals in an array
+repos!
 
