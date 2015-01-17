@@ -66,17 +66,19 @@ extension Repo: JSONDecodable {
   }
 }
 
+var repos : [Repo?]? = .None
+
 if let j: AnyObject = json {
   if let value = JSONValue.parse <^> j {
     switch value {
     case .JSONArray(let a):
-      let repos = a.map(Repo.decode)
-      println(repos.first!!.description)
+      repos = a.map(Repo.decode)
     default:
       println("Not an array")
     }
   }
 }
 
+println(repos)
 
 
