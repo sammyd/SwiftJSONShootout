@@ -42,7 +42,7 @@ if let json : AnyObject = json {
           if let url_string = jsonItem.valueForKey("url") as? String {
             if let fork = jsonItem.valueForKey("fork") as? Bool {
               if let url = NSURL(string: url_string) {
-                var description = jsonItem.valueForKey("description") as? String
+                let description = jsonItem.valueForKey("description") as? String
                 var homepage: NSURL? = .None
                 if let homepage_string = jsonItem.valueForKey("homepage") as? String {
                   homepage = NSURL(string: homepage_string)
@@ -59,9 +59,40 @@ if let json : AnyObject = json {
   }
 }
 
-println(repos)
+repos
 
 
 //----------------------//
 // MARK:- Optional Tree
 //----------------------//
+var repos_ot = [Repo]()
+
+if let repo_array = json as? NSArray {
+  for repo_item in repo_array {
+    if let repo_dict = repo_item as? NSDictionary {
+      if let id = repo_dict["id"] as? Int {
+        if let name = repo_dict["name"] as? String {
+          if let url_string = repo_dict["url"] as? String {
+            if let fork = repo_dict["fork"] as? Bool {
+              if let url = NSURL(string: url_string) {
+                let description = repo_dict["description"] as? String
+                var homepage: NSURL? = .None
+                if let homepage_string = repo_dict["homepage"] as? String {
+                  homepage = NSURL(string: homepage_string)
+                }
+                let repo = Repo(id: id, name: name, desc: description, url: url,
+                                homepage: homepage, fork: fork)
+                repos_ot += [repo]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+repos_ot
+
+
+
