@@ -2,13 +2,32 @@
 
 ## Introduction
 
-- Enormous amount been written on this topic, but some of us don't want to
-understand all the theory.
-- This is a pragmatic review of the current offering in Swift
-- All use the JSONSerializer to convert the raw json string into a tree of Cocoa
-objects
-- How do we interpret the resulting blob - given that all we know is that we are
-given an `AnyObject`?
+I'm not entirely sure why, but parsing JSON in Swift appears to be one of the
+most popular topics to write about. Maybe it's a right of passage to becoming a
+Swift blogger? Anyway, it seems like a good time to get involved.
+
+There have been some truly excellent blog posts about using JSON with Swift, but
+they mainly focus on the theory behind using the functional aspects of the new
+language to the best effect. This is great, and I recommend you read them, but
+we don't necessarily want to have to learn a whole new programming paradigm to
+implement the network data layer of our app.
+
+This article is a pragmatic review of the current options available for JSON
+parsing in Swift, covering some of the most popular new libraries.
+
+All approaches rely on Cocoa's `NSJSONSerialization` class to handle the JSON
+string to Foundation object parsing. The interesting question is what happens at
+this point. In the Swift world, the output of 
+`JSONObjectWithData(_:, options:, error:)` is an `AnyObject?` blob. What can we
+do with this? We know it's made up of Foundation objects such as `NSArray`, 
+`NSDictionary`, `NSNumber` etc, but the structure is dependent on the schema of
+the JSON.
+
+First of all we'll take a look at what we'd actually like from a JSON parser, in
+an ideal world, before reviewing the naïve approaches you'd expect as a seasoned
+objective-C developer. Then we'll consider two new frameworks that have popped
+up in the last few months, explaining their underlying concepts and reviewing
+how close they come to our ideal scenario.
 
 
 ### Wishlist
