@@ -32,10 +32,24 @@ how close they come to our ideal scenario.
 
 ### Wishlist
 
-- Have model objects inside our app
-- These should be used to represent the incoming JSON stream
-- Should operate in a type-safe manner
-- Don't want partially formed model objects
+JSON is a great serialization technology due to its simple specification, and
+accessibility to both humans and machines. However, it quickly becomes unwieldy
+within the context of an application. Most software design architectures have
+the concept of a model layer - that is a selection of objects used to model the
+data structure that you application acts upon. It is these model objects that
+the JSON should be turned in to once inside the application.
+
+Since the `NSJSONSerialization` class has no knowledge of the specific model
+layer within your application, it translates the JSON into the generic types
+within Foundation. It is the next step - translating these Foundation types into
+our data model - that is important.
+
+Our parser should leverage the type-safety that underlies Swift, and also not
+allow partial objects to be created.
+
+As you'll see, satisfying these requirements is not too difficult in a
+'best-case' scenario, but becomes increasingly difficult when attempting to cope
+with errors in the JSON data structure.
 
 ### Other approaches
 
