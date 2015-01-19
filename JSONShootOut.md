@@ -53,12 +53,28 @@ with errors in the JSON data structure.
 
 ### Other approaches
 
-- C# offers a dynamic object approach. This is a small extension compared to the
-existing JSON serializer, and doesn't help a lot
-- Alternatively, via annotations and reflection, C# can take a JSON string and
-return the appropriate model object structure.
-- Ideally we want the latter of these two approaches, but can't achieve it
-without reflection. How close can we get to it?
+Before diving into the problem from a Swift point of view, let's take a moment
+to review how other languages handle JSON.
+
+C# offers an approach which uses dynamic objects. That is to say that the
+structure of the objects is not known at compile time, but instead they are
+created at runtime. In some respects, this is a lot like the behavior of
+`NSJSONSerialization`, with the extension of using properties on a dynamic
+objects instead of a dictionary keyed on strings. This approach is not typesafe,
+in that the type-checker has no knowledge of the dynamic objects, and therefore
+lets you do whatever you wish with them in the code. It isn't until runtime
+(i.e. once the JSON has been parsed) that you discover particular properties
+don't exist, or are of the incorrect type.
+
+Sticking with C#, there are alternative approaches that automatically
+deserialize JSON into pre-defined model objects through reflection and
+annotations. Since your define the model objects in code, you retain the type
+safety you're used to, and the annotations/reflection mean that you don't
+repeat yourself.
+
+Ideally we'd like to use the latter of these two approaches in Swift. Swift
+doesn't yet support reflection or annotations, so we can't get quite the same
+functionality, but how close can we get?
 
 ### Accompanying Project
 
