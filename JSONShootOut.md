@@ -78,13 +78,17 @@ functionality, but how close can we get?
 
 ### Accompanying Project
 
-- A workspace containing multiple playgrounds - each demonstrating a different
-part of this article
-- Two of the playgrounds rely on 3rd party dependencies, which are referenced
-using Carthage. These should be checked into the repo, so you shouldn't need to
-fiddle with Carthage to get it to work
-- The dependencies will need to be built tho. Select each OSX scheme in turn,
-and build it.
+This article has accompanying code to demonstrate the different approaches to
+JSON parsing in Swift, and it takes the form of three playgrounds, combined
+together in a workspace. The workspace also contains projects for the three
+framework dependencies - SwiftyJSON, Argo and Runes. Combining everything in a
+workspace allows you to use dependencies within playgrounds.
+
+Carthage was used to import the dependencies, but since they have been committed
+into the repo, you shouldn't need to worry about it. You will, however, need to
+build the frameworks in the workspace. The playgrounds are for OSX, so select
+each of __ArgoMac__ and __SwiftJSONOX__ from the build schemes menu and then
+build it. Then the playgrounds will work as expected.
 
 ## Naïve Parsing
 
