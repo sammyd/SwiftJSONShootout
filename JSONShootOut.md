@@ -232,13 +232,81 @@ use some of the new features of Swift?
 
 ## SwiftyJSON
 
-- Open source library to assist with parsing of JSON
-- Under the hood it involves specification of a JSON enum as a type to represent
-the JSON structure
-- Also got lots of implicit type conversions to simplify optional chaining
-- In our required situation, still ends up with a tree of optionals to ensure
-model object is completely formed
-- Good for extracting specific values from a JSON structure
+As was mentioned in the intro to this article, we're not actually going to dig
+too far into _how_ things are being implemented in Swift, but rather discover
+how others (via frameworks) have used the functionality to improve the developer
+experience associated with parsing JSON.
+
+First up is an open source library called __SwiftyJSON__. The key functionality
+within Swift that drives the approach taken in __SwiftyJSON__ is the
+introduction of a more complete `enum` type - more specifically, one that allows
+associated values. This is used to create a `JSON` type, which can take a
+variety of different cases, each with an associated value. i.e. every element in
+a JSON structure can be represented using a single type - a string is still of
+type JSON, but with an associated `String` value, etc. This might sound a little
+confusing, but once you get your head round it you'll see that it's really
+powerful. This is starting to scratch the surface of a topic known as
+"Algebraic Data Types" from within functional programming. As with all topics in
+functional programming, it sounds a lot more complicated than it actually is.
+
+In addition to this fundamental `JSON` datatype, __SwiftyJSON__ also adds lots
+of implicit type conversions to simplify the typing frenzy that is optional
+chaining.
+
+So, enough theory, what does this actually look like when applied to the
+aforementioned `Repo` array?
+
+    let json = JSON(data: rawJSON!, options: .allZeros, error: nil)
+
+    var repos = [Repo]()
+    for (index: String, subJson: JSON) in json {
+      if let id = subJson["id"].int {
+        if let name = subJson["name"].string {
+          if let url = subJson["url"].string {
+            if let fork = subJson["fork"].bool {
+              var homepage: NSURL? = .None
+              if let homepage_raw = subJson["homepage"].string {
+                homepage = NSURL(string: homepage_raw)
+              }
+              let url_url = NSURL(string: url)!
+              repos += [Repo(id: id, name: name, desc: subJson["description"].string,
+                url: url_url, homepage: homepage, fork: fork)]
+            }
+          }
+        }
+      }
+    }
+
+Some things to note about this code segment:
+- __Implicit NSJSONSerialization__. SwiftyJSON includes this as part of its
+implementation, so you actually just need to pass the raw `NSData` object.
+- __Custom enumeration__. A new `for(index:, subJson:)` method has been created
+which looks a little bit like a `for-in` loop. This works on a JSON array, and
+provides each element as a `JSON` object.
+- __JSON Subscripting__. If a `JSON` element is of a dictionary type then
+subscripting behaves as you might expect, allowing things like `subJson["url"]`.
+- __JSON casting__. `JSON` elements also have properties on them which allow you
+to extract the associated value. For example, if the element is of a string
+type, you can extract that string with the `string` method. These properties are
+all optionals, so if you attempt to extract a string from a number element,
+you'll get rewarded with `.None`. 
+- __Rightward Drift__. It's still there - again ensuring that it's impossible to
+construct a malformed `Repo` object. This is because the accessor properties on
+the `JSON` enum are all optional, and not all of our `Repo` properties accept
+optionals.
+- __Type Conversion__. The `NSString` to `NSURL` type conversion is still part
+of the parsing tree. This is probably a little unfair; it is perfectly possible
+to define an extension to the `JSON` enum to add a property of type `NSURL?`.
+This would implement the same functionality as the existing code, but would be
+in a more appropriate place.
+
+So in summary, it's a lot better than the original approach, but it is still
+liable to end up with an optional tree somewhere. It's great for extracting
+specific values from a JSON data structure, but doesn't solve the problem of
+converting the JSON to model objects in a particularly elegant way. You could
+argue that maybe it's not supposed to do that - it has succeeded in making
+working with JSON a much more type-safe exercise, but you're still left with
+writing a lot of the parsing logic yourself.
 
 ## Argo
 
