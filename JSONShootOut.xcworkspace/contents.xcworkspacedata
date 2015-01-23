@@ -13,6 +13,9 @@
       <FileRef
          location = "group:JSONShootOut_Swifty.playground">
       </FileRef>
+      <FileRef
+         location = "group:JSONShootOut_Swiftz.playground">
+      </FileRef>
    </Group>
    <Group
       location = "container:"
