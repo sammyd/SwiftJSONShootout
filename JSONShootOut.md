@@ -92,14 +92,143 @@ build it. Then the playgrounds will work as expected.
 
 ## Naïve Parsing
 
-- First approach looks at how to deal with the raw JSON structure. 
-- Can use `valueForKeyPath`
-- Not very safe
-- Involves lots of optional nesting
-- Alternatively, can cast the Cocoa objects to their Swift counterparts and
-extract data that way.
-- Marginally safer
-- Still a huge optional nesting tree
+The output from the `NSJSONSerialization` class is composed of Foundation
+objects - `NSDictionary`, `NSArray`, `NSString`, `NSNumber`, `NSDate` and
+the all-important `NSNull`. Understandably, coming from an objective-C
+heritage, your first attempt at interpreting this data structure to match your
+model layer might be to deal with it directly. Since all the constituent parts
+are subclasses of `NSObject`, and properly implement key-value coding (KVC), you
+can jump straight in with the `valueForKeyPath:` method.
+
+For example, given an `NSDictionary` that represents a GitHub repository from
+the __repos__ API, you could find discover the repo name as follows:
+
+    let repo_name = repo_json.valueForKeyPath("name")
+
+Notice that since you're leveraging KVC, you can delve further into the nested
+structure:
+
+    let owner_login = repo_json.valueForKeyPath("owner.login")
+
+This approach is quite powerful for pulling out the odd element from a JSON
+structure, however, it doesn't stack up very well when trying to populate a
+model object. For example, the `Repo` struct is a small subset of the data
+returned in the JSON:
+
+    struct Repo {
+      let id: Int
+      let name: String
+      let desc: String?
+      let url: NSURL
+      let homepage: NSURL?
+      let fork: Bool
+    }
+
+To correctly populate an array of `Repo` objects using `valueForKeyPath`, you'd
+have to write code along the following lines:
+
+var repos = [Repo]()
+
+    if let json : AnyObject = json {
+      if let array = json as? NSArray {
+        for jsonItem in array as [AnyObject] {
+          if let id = jsonItem.valueForKey("id") as? Int {
+            if let name = jsonItem.valueForKey("name") as? String {
+              if let url_string = jsonItem.valueForKey("url") as? String {
+                if let fork = jsonItem.valueForKey("fork") as? Bool {
+                  if let url = NSURL(string: url_string) {
+                    let description = jsonItem.valueForKey("description") as? String
+                    var homepage: NSURL? = .None
+                    if let homepage_string = jsonItem.valueForKey("homepage") as? String {
+                      homepage = NSURL(string: homepage_string)
+                    }
+                    let repo = Repo(id: id, name: name, desc: description, url: url,
+                                    homepage: homepage, fork: fork)
+                    repos += [repo]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+There are a few points to note about this code:
+
+- __Rightward Drift__ If the JSON is malformed, or there is a mistake in the
+parsing code, then `valueForKeyPath()` will return `nil`. Therefore you need to
+check that each time you extract a value, it is not `nil`, and it is of the
+expected type. This leads to the optional-checking tree.
+- __Type conversions__ If your JSON includes types which are not directly
+supported by `NSJSONSerialization` (such as `NSURL`) then the conversion code is
+likely to end up mixed in with the optional checking tree, as it does here.
+- __Repeated Structure__ Notice that all this code is really doing is extracting
+the appropriate values for your pre-defined `Repo` struct and then creating one.
+This feels like repeated effort, especially since the property names in the
+struct are identical to those in the JSON itself.
+- __Legibility__ I bet you haven't actually read the above code block. Not
+_really_ read it - I mean read it to understand it. I don't blame you - it's an
+impenetrable mess. It's responsible for extracting values, type checking,
+validation, type conversion, object creation and appending to an array. That's
+not a sign of a well-formed block of code.
+
+Don't dwell on this example too much - the code could almost certainly be
+reformatted and improved, whilst retaining the same approach. However, as we
+progress, you'll see that there are better approaches from the outset.
+
+You might have looked at this and decided that the `valueForKeyPath` approach is
+a deliberate attempt to be obtuse - there are better ways of working with
+Foundation objects in Swift. To an extent you'd be correct - `valueForKeyPath`
+is great at diving deep into object structures, but that might not always be
+ideal. For the interests of fairness, let's take a look at a slightly more
+Swift-friendly approach.
+
+The Foundation objects that are supported by `NSJSONSerialization` all have
+Swift counterparts that are bridged. For example, `NSString` in Foundation can
+be represented as a `String` in Swift. This gets a little more complicated with
+`NSArray` and `NSDictionary`, but with some optional casting, and liberal use of
+`AnyObject` you can work with pure Swift representations of the underlying
+Foundation objects.
+
+The previous code block for creating an array of `Repo` objects can be rewritten
+as the following:
+
+    var repos_ot = [Repo]()
+
+    if let repo_array = json as? NSArray {
+      for repo_item in repo_array {
+        if let repo_dict = repo_item as? NSDictionary {
+          if let id = repo_dict["id"] as? Int {
+            if let name = repo_dict["name"] as? String {
+              if let url_string = repo_dict["url"] as? String {
+                if let fork = repo_dict["fork"] as? Bool {
+                  if let url = NSURL(string: url_string) {
+                    let description = repo_dict["description"] as? String
+                    var homepage: NSURL? = .None
+                    if let homepage_string = repo_dict["homepage"] as? String {
+                      homepage = NSURL(string: homepage_string)
+                    }
+                    let repo = Repo(id: id, name: name, desc: description, url: url,
+                                    homepage: homepage, fork: fork)
+                    repos_ot += [repo]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+You should notice straight away that there isn't actually a huge amount of
+difference. The code still suffers from rightward drift from the optional
+nesting, it still has the type conversion embedded in the tree, and the
+structure has once again been replicated.
+
+OK, so we've established how far we can get with this naïve approach, somewhat
+inspired by our traditional objective-C days, but what happens when we start to
+use some of the new features of Swift?
 
 ## SwiftyJSON
 
