@@ -87,7 +87,7 @@ workspace allows you to use dependencies within playgrounds.
 Carthage was used to import the dependencies, but since they have been committed
 into the repo, you shouldn't need to worry about it. You will, however, need to
 build the frameworks in the workspace. The playgrounds are for OSX, so select
-each of __ArgoMac__ and __SwiftJSONOX__ from the build schemes menu and then
+each of __ArgoMac__ and __SwiftJSONOSX__ from the build schemes menu and then
 build it. Then the playgrounds will work as expected.
 
 ## Naïve Parsing
