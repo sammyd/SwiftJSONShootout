@@ -1,2 +1,3 @@
 github "thoughtbot/Argo"
 github "SwiftyJSON/SwiftyJSON"
+github "typelift/swiftz" "master"

@@ -43,6 +43,11 @@ public func >>-<T, U>(a: T?, f: T -> U?) -> U? {
     return a.flatMap(f)
 }
 
+@availability(*, unavailable, message="function (T -> U) does not return U?, perhaps you meant f <^> val")
+public func >>-<T, U>(a: T?, f: T -> U) -> U? {
+    return a.map(f)
+}
+
 /**
     Wrap a value in a minimal context of .Some
 

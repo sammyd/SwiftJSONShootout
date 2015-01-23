@@ -18,6 +18,9 @@
       location = "container:"
       name = "Dependencies">
       <FileRef
+         location = "group:Carthage/Checkouts/swiftz/swiftz.xcodeproj">
+      </FileRef>
+      <FileRef
          location = "group:Carthage/Checkouts/SwiftyJSON/SwiftyJSON.xcodeproj">
       </FileRef>
       <FileRef

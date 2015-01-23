@@ -1,3 +1,4 @@
 github "SwiftyJSON/SwiftyJSON" "2.1.3"
-github "thoughtbot/runes" "v1.1"
+github "thoughtbot/runes" "v1.1.1"
+github "typelift/swiftz" "695257710fcf8d40a31b6e72c969af1ff39f550d"
 github "thoughtbot/Argo" "v0.3.2"
