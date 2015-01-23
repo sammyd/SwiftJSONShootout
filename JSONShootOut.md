@@ -310,6 +310,54 @@ writing a lot of the parsing logic yourself.
 
 ## Argo
 
+__SwiftyJSON__ introduced a slightly more functional way of thinking to parsing
+JSON, but we can take that line of thought much further. That's the approach
+taken by, amongst others, __Argo__ (swiftz is another example, but is a
+less-targeted toolkit, with a JSON approach that doesn't appear to be quite as
+well thought out). The approach used in __Argo__ is inspired by parser design
+from purely functional languages such as Haskell, so there is a lot of
+background and a rich heritage to this approach.
+
+It is designed to populate model objects directly from the JSON stream, by
+specifying how each of the models should be 'decoded' from the stream. More
+often than not, this boils down to describing which fields in the JSON object
+should be used for each of the properties in your model object.
+
+Inevitably, since this is a functional approach, it involves some crazy looking
+operators. Therefore, rather than just chucking a load of code at you, we'll
+take it in smaller chunks.
+
+We start with exactly the same `Repo` struct as in every other example, and this
+time add an extension that defines the conformance to the `JSONDecodable`
+protocol:
+
+    extension Repo: JSONDecodable {
+      static func create(id: Int)(name: String)(desc: String?)
+                        (url: NSURL)(homepage: NSURL?)(fork: Bool) -> Repo {
+        return Repo(id: id, name: name, desc: desc,
+                    url: url, homepage: homepage, fork: fork)
+      }
+      
+      static func decode(j: JSONValue) -> Repo? {
+        return Repo.create
+          <^> j <|  "id"
+          <*> j <|  "name"
+          <*> j <|? "description"
+          <*> j <|  "url"
+          <*> j <|? "homepage"
+          <*> j <|  "fork"
+      }
+    }
+
+This looks scary - but keep calm. The `JSONDecodable` protocol actually defines
+just one method - the static `decode()` method. This takes a `JSONValue` (think
+equivalent to the `JSON` enum used in __SwiftyJSON__) and attempts to create a
+new `Repo` (hence the optional). The other method that's been defined here is
+the curried `create` method - and this is only done as an implementation detail
+associated with Swift initializers.
+
+The body of the `decode` method contains several custom operators...
+
 - A 'pure-functional' approach to JSON parsing
 - Designed to populate model objects directly from the JSON stream
 - Copes with primitives automatically
