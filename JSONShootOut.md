@@ -356,7 +356,29 @@ new `Repo` (hence the optional). The other method that's been defined here is
 the curried `create` method - and this is only done as an implementation detail
 associated with Swift initializers.
 
-The body of the `decode` method contains several custom operators...
+The body of the `decode` method contains several custom operators, and getting
+your head around these will allow you to construct your own `decode` methods.
+Rather than explaining in great detail exactly what these methods do, lets take
+a look at how to use them in the context of implementing a `decode` method:
+
+- `<^>` __map__.
+- `<*>` __apply__.
+- `<|` __parse value__. This attempts to extract the field specified by the
+string to the right from the `JSONValue` on the left. It will then cast to
+appropriate type. If this is impossible then the operation will return `.None`,
+which will cause the parsing chain to fail. You can parse nested values with an
+array of strings e.g. `<| ["", ""]`
+- `<|?` __parse optional value__. This works in exactly the same way as the
+previous operator, only allows parsing into optional values. This means that the
+parsing chain will not fail if the specified field is `null` or cannot be found.
+
+In addition to the ones used above, the following are also important:
+
+- `<||` __parse array of values__. Takes an array from the JSON and parses it
+into an array in Swift.
+- `<||?` __parse optional array of values__. Identical to the previous operator,
+but will parse to an optional array if required.
+
 
 - A 'pure-functional' approach to JSON parsing
 - Designed to populate model objects directly from the JSON stream
