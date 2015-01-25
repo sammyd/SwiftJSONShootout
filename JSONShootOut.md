@@ -361,8 +361,6 @@ your head around these will allow you to construct your own `decode` methods.
 Rather than explaining in great detail exactly what these methods do, lets take
 a look at how to use them in the context of implementing a `decode` method:
 
-- `<^>` __map__.
-- `<*>` __apply__.
 - `<|` __parse value__. This attempts to extract the field specified by the
 string to the right from the `JSONValue` on the left. It will then cast to
 appropriate type. If this is impossible then the operation will return `.None`,
@@ -371,6 +369,16 @@ array of strings e.g. `<| ["", ""]`
 - `<|?` __parse optional value__. This works in exactly the same way as the
 previous operator, only allows parsing into optional values. This means that the
 parsing chain will not fail if the specified field is `null` or cannot be found.
+- `<^>` __map__. This takes a function `T -> U` and an optional input `T?` and
+returns an optional output `U?`. In the parsing chain, the function is the
+curried `create` function, the optional input is the output from the value
+parsing function. The output is now an optional function - comprising the input
+`create` function, with one less level of currying.
+- `<*>` __apply__. This is very similar to the __map__, only this time the
+function it operates on is optional itself - i.e. `(T -> U)?`. This matches with
+the result from the parsing chain; if a result cannot be parsed then the output
+will be none. Otherwise, the output will be a curried `create` function with the
+more recent input parameter applied.
 
 In addition to the ones used above, the following are also important:
 
@@ -379,22 +387,86 @@ into an array in Swift.
 - `<||?` __parse optional array of values__. Identical to the previous operator,
 but will parse to an optional array if required.
 
+This isn't as confusing as it might seem. These are the important things to
+note:
 
-- A 'pure-functional' approach to JSON parsing
-- Designed to populate model objects directly from the JSON stream
-- Copes with primitives automatically
-- Requires a `decode` method to be written for custom objects (since there's no
-reflection)
-- Written in a functional style, so succinct, but complex for a first-timer
-- Built in support for incomplete model objects
+- The `create` function is curried. This means that each individual parameter
+can be provided in turn. This is important to support the chain-approach to
+parsing.
+- The parsing functions (`<|`, `<|?` etc) are used to extract the values from
+the input `JSONValue`. If they succeed the value is correctly typed, otherwise
+it is `.None`.
+- These extracted values are applied in turn to the curried `create` function.
+The order of the curried function and the parsing chain must therefore match.
+- If at any point a parsing function fails, the repeated application of the
+__apply__ function means that the model object will not be formed.
 
+This approach actually gets us quite close to the functionality we desire. Once
+you've ensured that your model object conforms to the `JSONDecodable` protocol,
+parsing the incoming JSON structure becomes a one-liner:
+
+    let repos: [Repo]? = (JSONValue.parse <^> json) >>- JSONValue.mapDecode
+
+Once again, this line isn't overly self-explanatory (welcome to functional
+programming). The output will be an array of `Repo` objects - as expected. The
+first clause (`JSONValue.parse <^> json`) takes the output of the
+`NSJSONSerializer` and converts it into the `JSONValue` structure used by Argo.
+This is then 'fed-in' to the `mapDecode` function, which maps over an array and
+attempts to convert each `JSONValue` within to the type specified in the
+signature (here - `Repo`). The `>>-` operator is flatmap, and is used here to
+cope with any `.None` inputs that might appear in the output of the initial
+conversion.
+
+This approach required a large amount of explanation - it appears very alien to
+our procedural eyes. However, I suggest that it presents a very elegant
+solution - certainly one which is close to the desired "automatic mapping to
+model objects" set out at the beginning of this article.
+
+Something that was skipped over slightly in this explanation is the ability to
+add additional value converters without difficulty. The parsing of values
+automatically does type conversion where it can, but if you want to support
+additional types, it's as easy as ensuring that that type also conforms to the
+`JSONDecodable` protocol. This is demonstrated in the playground example with
+`NSURL`.
 
 ## Conclusion
 
-- Can't get what I want yet
-- Argo is the closest, and doesn't involve a huge amount of code
-- However, it can be difficult to get your head around at first
-- With reflection, the `decode` method in Argo could be replaced with a default,
-which would get exactly what I want
 
+This has been a reasonably comprehensive review of what's currently possible
+with Swift, and a look at some of the great libraries that have been built on
+top of the new language. It hasn't gone in to great details about the theory
+behind the parsing options, but it should have given you enough info to assist
+in your decision on what approach to take, and to help you once you have done
+that.
+
+It should be noted that not one of the options presented actually attains what
+we set out to achieve - i.e. that we could automatically parse a JSON data
+structure into the model objects in our data layer. Argo got by far the closest,
+with the additional restriction being that we had to provide our own `decode`
+functions to extract our model objects from the JSON data structure. This isn't
+an entirely bad thing - even in our best case scenario we'd expect that we'd
+have cases that needed special attention. And the great thing about Argo is that
+using the functional operators and patterns meant that this code was succinct.
+It isn't, however, necessarily very easy to get your head around at first. I
+suggest that this is because the new functional operators and ideas are still
+new to us - they appear alien. Once you've got your head around the parsing
+chain pattern then I think the Argo approach is both easy to comprehend and
+reason about - certainly more so than 
+
+Once Swift adds functionality for reflection/introspection then the `decode`
+method present in Argo could be replaced with a sensible default. This would
+likely work for most cases (i.e. where property names match up with field names
+in the JSON), and customizations could still be provided in the existing manner.
+At this point I'll be happy to say that JSON parsing in Swift has finally become
+a non-issue and the world can stop blogging about it. Maybe at that stage it'll
+be time to argue about IoC containers instead?
+
+If you've enjoyed reading about this topic in Swift then maybe you'd be
+interested in reading some of the other things I've written about other iOS
+topics. In fact, you might be interested in a book about iOS 8, written to help
+you get your head around all the important new technologies. To grab your free
+copy, head on over to the ShinobiControls site at 
+[shinobicontrols.com/iOS8](http://shinobicontrols.com/iOS8).
+
+sam
 
