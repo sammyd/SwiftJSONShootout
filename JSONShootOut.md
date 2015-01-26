@@ -45,10 +45,8 @@ within Foundation. It is the next step - translating these Foundation types into
 our data model - that is important.
 
 Our parser should leverage the type-safety that underlies Swift, and also prevent
-creation of partial objects.
-
-<aside>What do you mean by partial objects? This make me think of C# partial
-classes, but I know that isn't waht you mean in this context!</aside>
+creation of invalid objects - i.e. model objects which don't have all required
+properties populated.
 
 As you'll see, satisfying these requirements is not too difficult in a
 'best-case' scenario, but becomes increasingly difficult when attempting to cope
@@ -454,15 +452,10 @@ It isn't, however, necessarily very easy to get your head around at first. I
 suggest that this is because the new functional operators and ideas are still
 new to us - they appear alien. Once you've got your head around the parsing
 chain pattern then I think the Argo approach is both easy to comprehend and
-reason about - certainly more so than 
+reason about - certainly more so than the mountain of optional tests we saw at
+the beginning of this article.
 
-<aside>than what?!</aside>
-
-Once Swift adds functionality for reflection/introspection 
-
-<aside>are you just betting on this happening? or have you seen somethign more concrete</aside>
-
-then the `decode`
+If Swift were to add functionality for reflection/introspection then the `decode`
 method present in Argo could be replaced with a sensible default. This would
 likely work for most cases (i.e. where property names match up with field names
 in the JSON), and customizations could still be provided in the existing manner.
