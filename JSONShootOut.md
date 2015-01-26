@@ -2,9 +2,9 @@
 
 ## Introduction
 
-I'm not entirely sure why, but parsing JSON in Swift appears to be one of the
-most popular topics to write about. Maybe it's a right of passage to becoming a
-Swift blogger? Anyway, it seems like a good time to get involved.
+In the world of Swift blogging, JSON parsing seems to be a 'hot topic'. Maybe it's
+a right of passage to becoming a Swift blogger? Anyway, it seems like a good time
+to get involved.
 
 There have been some truly excellent blog posts about using JSON with Swift, but
 they mainly focus on the theory behind using the functional aspects of the new
@@ -37,15 +37,15 @@ accessibility to both humans and machines. However, it quickly becomes unwieldy
 within the context of an application. Most software design architectures have
 the concept of a model layer - that is a selection of objects used to model the
 data structure that you application acts upon. It is these model objects that
-the JSON should be turned in to once inside the application.
+the JSON should be converted to inside the application.
 
 Since the `NSJSONSerialization` class has no knowledge of the specific model
 layer within your application, it translates the JSON into the generic types
 within Foundation. It is the next step - translating these Foundation types into
 our data model - that is important.
 
-Our parser should leverage the type-safety that underlies Swift, and also not
-allow partial objects to be created.
+Our parser should leverage the type-safety that underlies Swift, and also prevent
+creation of partial objects.
 
 As you'll see, satisfying these requirements is not too difficult in a
 'best-case' scenario, but becomes increasingly difficult when attempting to cope
@@ -127,7 +127,7 @@ returned in the JSON:
 To correctly populate an array of `Repo` objects using `valueForKeyPath`, you'd
 have to write code along the following lines:
 
-var repos = [Repo]()
+    var repos = [Repo]()
 
     if let json : AnyObject = json {
       if let array = json as? NSArray {
@@ -175,7 +175,7 @@ not a sign of a well-formed block of code.
 
 Don't dwell on this example too much - the code could almost certainly be
 reformatted and improved, whilst retaining the same approach. However, as we
-progress, you'll see that there are better approaches from the outset.
+progress, you'll see that there are better approaches.
 
 You might have looked at this and decided that the `valueForKeyPath` approach is
 a deliberate attempt to be obtuse - there are better ways of working with
@@ -365,7 +365,7 @@ a look at how to use them in the context of implementing a `decode` method:
 string to the right from the `JSONValue` on the left. It will then cast to
 appropriate type. If this is impossible then the operation will return `.None`,
 which will cause the parsing chain to fail. You can parse nested values with an
-array of strings e.g. `<| ["", ""]`
+array of strings e.g. `<| ["owner", "login"]`
 - `<|?` __parse optional value__. This works in exactly the same way as the
 previous operator, only allows parsing into optional values. This means that the
 parsing chain will not fail if the specified field is `null` or cannot be found.
