@@ -25,7 +25,7 @@ the JSON.
 
 First of all we'll take a look at what we'd actually like from a JSON parser, in
 an ideal world, before reviewing the naïve approaches you'd expect as a seasoned
-objective-C developer. Then we'll consider two new frameworks that have popped
+Objective-C developer. Then we'll consider two new frameworks that have popped
 up in the last few months, explaining their underlying concepts and reviewing
 how close they come to our ideal scenario.
 
@@ -36,7 +36,7 @@ JSON is a great serialization technology due to its simple specification, and
 accessibility to both humans and machines. However, it quickly becomes unwieldy
 within the context of an application. Most software design architectures have
 the concept of a model layer - that is a selection of objects used to model the
-data structure that you application acts upon. It is these model objects that
+data structure that your application acts upon. It is these model objects that
 the JSON should be converted to inside the application.
 
 Since the `NSJSONSerialization` class has no knowledge of the specific model
@@ -46,6 +46,9 @@ our data model - that is important.
 
 Our parser should leverage the type-safety that underlies Swift, and also prevent
 creation of partial objects.
+
+<aside>What do you mean by partial objects? This make me think of C# partial
+classes, but I know that isn't waht you mean in this context!</aside>
 
 As you'll see, satisfying these requirements is not too difficult in a
 'best-case' scenario, but becomes increasingly difficult when attempting to cope
@@ -68,7 +71,7 @@ don't exist, or are of the incorrect type.
 
 Sticking with C#, there are alternative approaches that automatically
 deserialize JSON into pre-defined model objects through reflection and
-annotations. Since your define the model objects in code, you retain the type
+annotations. Since you define the model objects in code, you retain the type
 safety you're used to, and the annotations/reflection mean that you don't
 repeat yourself.
 
@@ -84,7 +87,7 @@ together in a workspace. The workspace also contains projects for the three
 framework dependencies - SwiftyJSON, Argo and Runes. Combining everything in a
 workspace allows you to use dependencies within playgrounds.
 
-Carthage was used to import the dependencies, but since they have been committed
+[Carthage](https://github.com/Carthage/Carthage) was used to import the dependencies, but since they have been committed
 into the repo, you shouldn't need to worry about it. You will, however, need to
 build the frameworks in the workspace. The playgrounds are for OSX, so select
 each of __ArgoMac__ and __SwiftJSONOSX__ from the build schemes menu and then
@@ -227,7 +230,7 @@ nesting, it still has the type conversion embedded in the tree, and the
 structure has once again been replicated.
 
 OK, so we've established how far we can get with this naïve approach, somewhat
-inspired by our traditional objective-C days, but what happens when we start to
+inspired by our traditional Objective-C days, but what happens when we start to
 use some of the new features of Swift?
 
 ## SwiftyJSON
@@ -453,7 +456,13 @@ new to us - they appear alien. Once you've got your head around the parsing
 chain pattern then I think the Argo approach is both easy to comprehend and
 reason about - certainly more so than 
 
-Once Swift adds functionality for reflection/introspection then the `decode`
+<aside>than what?!</aside>
+
+Once Swift adds functionality for reflection/introspection 
+
+<aside>are you just betting on this happening? or have you seen somethign more concrete</aside>
+
+then the `decode`
 method present in Argo could be replaced with a sensible default. This would
 likely work for most cases (i.e. where property names match up with field names
 in the JSON), and customizations could still be provided in the existing manner.
