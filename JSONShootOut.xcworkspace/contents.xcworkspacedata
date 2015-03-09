@@ -13,16 +13,10 @@
       <FileRef
          location = "group:JSONShootOut_Swifty.playground">
       </FileRef>
-      <FileRef
-         location = "group:JSONShootOut_Swiftz.playground">
-      </FileRef>
    </Group>
    <Group
       location = "container:"
       name = "Dependencies">
-      <FileRef
-         location = "group:Carthage/Checkouts/swiftz/swiftz.xcodeproj">
-      </FileRef>
       <FileRef
          location = "group:Carthage/Checkouts/SwiftyJSON/SwiftyJSON.xcodeproj">
       </FileRef>
