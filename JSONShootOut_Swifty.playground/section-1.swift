@@ -1,7 +1,7 @@
 
 
 
-import Cocoa
+import Foundation
 import SwiftyJSON
 
 /* Import the JSON from a file */
