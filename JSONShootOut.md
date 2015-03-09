@@ -294,20 +294,17 @@ aforementioned `Repo` array?
 
     var repos = [Repo]()
     for (index: String, subJson: JSON) in json {
-      if let id = subJson["id"].int {
-        if let name = subJson["name"].string {
-          if let url = subJson["url"].string {
-            if let fork = subJson["fork"].bool {
-              var homepage: NSURL? = .None
-              if let homepage_raw = subJson["homepage"].string {
-                homepage = NSURL(string: homepage_raw)
-              }
-              let url_url = NSURL(string: url)!
-              repos += [Repo(id: id, name: name, desc: subJson["description"].string,
-                url: url_url, homepage: homepage, fork: fork)]
+      if let id = subJson["id"].int,
+         let name = subJson["name"].string,
+         let url = subJson["url"].string,
+         let fork = subJson["fork"].bool {
+            var homepage: NSURL? = .None
+            if let homepage_raw = subJson["homepage"].string {
+              homepage = NSURL(string: homepage_raw)
             }
-          }
-        }
+            let url_url = NSURL(string: url)!
+            repos += [Repo(id: id, name: name, desc: subJson["description"].string,
+              url: url_url, homepage: homepage, fork: fork)]
       }
     }
 
@@ -324,10 +321,11 @@ to extract the associated value. For example, if the element is of a string
 type, you can extract that string with the `string` method. These properties are
 all optionals, so if you attempt to extract a string from a number element,
 you'll get rewarded with `.None`. 
-- __Rightward Drift__. It's still there - again ensuring that it's impossible to
-construct a malformed `Repo` object. This is because the accessor properties on
-the `JSON` enum are all optional, and not all of our `Repo` properties accept
-optionals.
+- __Rightward Drift__. Well, it's not really there, because of the new
+syntax in Swift 1.2, but there is a huge `if` statement ensuring that it's
+impossible to construct a malformed `Repo` object. This is because the accessor
+properties on the `JSON` enum are all optional, and not all of our `Repo`
+properties accept optionals.
 - __Type Conversion__. The `NSString` to `NSURL` type conversion is still part
 of the parsing tree. This is probably a little unfair; it is perfectly possible
 to define an extension to the `JSON` enum to add a property of type `NSURL?`.
@@ -372,7 +370,7 @@ protocol:
                     url: url, homepage: homepage, fork: fork)
       }
       
-      static func decode(j: JSONValue) -> Repo? {
+      static func decode(j: JSON) -> Repo? {
         return Repo.create
           <^> j <|  "id"
           <*> j <|  "name"
@@ -384,7 +382,7 @@ protocol:
     }
 
 This looks scary - but keep calm. The `JSONDecodable` protocol actually defines
-just one method - the static `decode()` method. This takes a `JSONValue` (think
+just one method - the static `decode()` method. This takes a `JSON` (think
 equivalent to the `JSON` enum used in __SwiftyJSON__) and attempts to create a
 new `Repo` (hence the optional). The other method that's been defined here is
 the curried `create` method - and this is only done as an implementation detail
@@ -396,7 +394,7 @@ Rather than explaining in great detail exactly what these methods do, lets take
 a look at how to use them in the context of implementing a `decode` method:
 
 - `<|` __parse value__. This attempts to extract the field specified by the
-string to the right from the `JSONValue` on the left. It will then cast to
+string to the right from the `JSON` on the left. It will then cast to
 appropriate type. If this is impossible then the operation will return `.None`,
 which will cause the parsing chain to fail. You can parse nested values with an
 array of strings e.g. `<| ["owner", "login"]`
@@ -428,7 +426,7 @@ note:
 can be provided in turn. This is important to support the chain-approach to
 parsing.
 - The parsing functions (`<|`, `<|?` etc) are used to extract the values from
-the input `JSONValue`. If they succeed the value is correctly typed, otherwise
+the input `JSON`. If they succeed the value is correctly typed, otherwise
 it is `.None`.
 - These extracted values are applied in turn to the curried `create` function.
 The order of the curried function and the parsing chain must therefore match.
@@ -439,14 +437,14 @@ This approach actually gets us quite close to the functionality we desire. Once
 you've ensured that your model object conforms to the `JSONDecodable` protocol,
 parsing the incoming JSON structure becomes a one-liner:
 
-    let repos: [Repo]? = (JSONValue.parse <^> json) >>- JSONValue.mapDecode
+    let repos: [Repo]? = (JSONValue.parse <^> json) >>- decodeArray
 
 Once again, this line isn't overly self-explanatory (welcome to functional
 programming). The output will be an array of `Repo` objects - as expected. The
-first clause (`JSONValue.parse <^> json`) takes the output of the
-`NSJSONSerializer` and converts it into the `JSONValue` structure used by Argo.
-This is then 'fed-in' to the `mapDecode` function, which maps over an array and
-attempts to convert each `JSONValue` within to the type specified in the
+first clause (`JSON.parse <^> json`) takes the output of the
+`NSJSONSerializer` and converts it into the `JSON` structure used by Argo.
+This is then 'fed-in' to the `decodeArray` function, which maps over an array
+and attempts to convert each `JSON` within to the type specified in the
 signature (here - `Repo`). The `>>-` operator is flatmap, and is used here to
 cope with any `.None` inputs that might appear in the output of the initial
 conversion.
