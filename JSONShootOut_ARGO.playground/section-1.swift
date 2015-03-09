@@ -70,6 +70,6 @@ extension Repo: JSONDecodable {
 // This line represents the confusion surrounding functional programming
 let repos: [Repo]? = (JSON.parse <^> json) >>- decodeArray
 
-// Unwrap two levels of optionals in an array
+// Unwrap the optional array
 repos!
 
