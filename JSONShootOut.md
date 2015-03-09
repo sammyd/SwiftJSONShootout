@@ -160,7 +160,7 @@ There are a few points to note about this code:
 - __Rightward Drift__ If the JSON is malformed, or there is a mistake in the
 parsing code, then `valueForKeyPath()` will return `nil`. Therefore you need to
 check that each time you extract a value, it is not `nil`, and it is of the
-expected type. This leads to the optional-checking tree.
+expected type. This leads to the optional-checking tree, the so-called "pyramid of doom".
 - __Type conversions__ If your JSON includes types which are not directly
 supported by `NSJSONSerialization` (such as `NSURL`) then the conversion code is
 likely to end up mixed in with the optional checking tree, as it does here.
@@ -226,6 +226,39 @@ You should notice straight away that there isn't actually a huge amount of
 difference. The code still suffers from rightward drift from the optional
 nesting, it still has the type conversion embedded in the tree, and the
 structure has once again been replicated.
+
+Swift 1.2 introduces some new syntax around `if let` statements that
+significantly reduces the rightward drift. An `if` statement can include
+multiple (comma-separated) `let` statements, all of which must succeed in order
+for the conditional clause to be evaluated. Translating the above "pyramid of
+doom" into this new syntax results in the following:
+
+    var repos_pyramid = [Repo]()
+
+    if let repo_array = json as? NSArray {
+      for repo_item in repo_array {
+        if let repo_dict = repo_item as? NSDictionary,
+          let id = repo_dict["id"] as? Int,
+          let name = repo_dict["name"] as? String,
+          let url_string = repo_dict["url"] as? String,
+          let fork = repo_dict["fork"] as? Bool,
+          let url = NSURL(string: url_string) {
+            let description = repo_dict["description"] as? String
+            var homepage: NSURL? = .None
+            if let homepage_string = repo_dict["homepage"] as? String {
+              homepage = NSURL(string: homepage_string)
+            }
+            let repo = Repo(id: id, name: name, desc: description, url: url,
+              homepage: homepage, fork: fork)
+            repos_pyramid += [repo]
+        }
+      }
+    }
+
+Notice that all the fields can be extracted from the `NSDictionary` in one
+statement, using this new `let` syntax. Although the syntax is slightly nicer,
+it is still semantically equivalent - a fairly unpleasant mix of model structure
+and parsing logic.
 
 OK, so we've established how far we can get with this naïve approach, somewhat
 inspired by our traditional Objective-C days, but what happens when we start to
