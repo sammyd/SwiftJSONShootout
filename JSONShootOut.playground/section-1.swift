@@ -95,4 +95,29 @@ if let repo_array = json as? NSArray {
 repos_ot
 
 
+//---------------------------//
+// MARK:- No Pyramid of Doom
+//---------------------------//
+var repos_pyramid = [Repo]()
 
+if let repo_array = json as? NSArray {
+  for repo_item in repo_array {
+    if let repo_dict = repo_item as? NSDictionary,
+      let id = repo_dict["id"] as? Int,
+      let name = repo_dict["name"] as? String,
+      let url_string = repo_dict["url"] as? String,
+      let fork = repo_dict["fork"] as? Bool,
+      let url = NSURL(string: url_string) {
+        let description = repo_dict["description"] as? String
+        var homepage: NSURL? = .None
+        if let homepage_string = repo_dict["homepage"] as? String {
+          homepage = NSURL(string: homepage_string)
+        }
+        let repo = Repo(id: id, name: name, desc: description, url: url,
+          homepage: homepage, fork: fork)
+        repos_pyramid += [repo]
+    }
+  }
+}
+
+repos_pyramid
