@@ -38,9 +38,9 @@ extension Repo: Printable {
 //-------------//
 
 extension NSURL: JSONDecodable {
-  public class func decode(j: JSONValue) -> NSURL? {
+  public class func decode(j: JSON) -> NSURL? {
     switch j {
-    case .JSONString(let s):
+    case .String(let s):
       return NSURL(string: s)
     default:
       return nil
@@ -55,7 +55,7 @@ extension Repo: JSONDecodable {
                 url: url, homepage: homepage, fork: fork)
   }
   
-  static func decode(j: JSONValue) -> Repo? {
+  static func decode(j: JSON) -> Repo? {
     return Repo.create
       <^> j <|  "id"
       <*> j <|  "name"
@@ -68,7 +68,7 @@ extension Repo: JSONDecodable {
 
 
 // This line represents the confusion surrounding functional programming
-let repos: [Repo]? = (JSONValue.parse <^> json) >>- JSONValue.mapDecode
+let repos: [Repo]? = (JSON.parse <^> json) >>- decodeArray
 
 // Unwrap two levels of optionals in an array
 repos!

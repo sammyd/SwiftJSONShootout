@@ -4,9 +4,9 @@
     This will return a new array resulting from the transformation function beind applied to each value in the array
 
     :param: f A transformation function from type T to type U
-    :param: a An array of type [T]
+    :param: a A value of type [T]
 
-    :returns: An array of type [U]
+    :returns: A value of type [U]
 */
 public func <^><T, U>(f: T -> U, a: [T]) -> [U] {
     return a.map(f)
@@ -18,31 +18,40 @@ public func <^><T, U>(f: T -> U, a: [T]) -> [U] {
     This will return a new array resulting from the matrix of each function being applied to each value in the array
 
     :param: fs An array of transformation functions from type T to type U
-    :param: a An array of type [T]
+    :param: a A value of type [T]
 
-    :returns: An array of type [U]
+    :returns: A value of type [U]
 */
 public func <*><T, U>(fs: [T -> U], a: [T]) -> [U] {
     return a.apply(fs)
 }
 
 /**
-    flatMap a function over an array of values
+    flatMap a function over an array of values (left associative)
 
     apply a function to each value of an array and flatten the resulting array
 
-    :param: f A transformation function from type T to an array of type [U]
-    :param: a An array of type [T]
+    :param: f A transformation function from type T to type [U]
+    :param: a A value of type [T]
 
-    :returns: An array of type [U]
+    :returns: A value of type [U]
 */
 public func >>-<T, U>(a: [T], f: T -> [U]) -> [U] {
     return a.flatMap(f)
 }
 
-@availability(*, unavailable, message="function (T -> U) does not return [U], perhaps you meant f <^> val")
-public func >>-<T, U>(a: [T], f: T -> U) -> [U] {
-    return a.map(f)
+/**
+flatMap a function over an array of values (right associative)
+
+apply a function to each value of an array and flatten the resulting array
+
+:param: f A transformation function from type T to type [U]
+:param: a A value of type [T]
+
+:returns: A value of type [U]
+*/
+public func -<<<T, U>(f: T -> [U], a: [T]) -> [U] {
+  return a.flatMap(f)
 }
 
 /**
@@ -64,7 +73,7 @@ extension Array {
 
         :param: fs An array of transformation functions from type T to type U
 
-        :returns: An array of type [U]
+        :returns: A value of type [U]
     */
     func apply<U>(fs: [T -> U]) -> [U] {
         return fs.flatMap { f in self.map(f) }
@@ -75,9 +84,9 @@ extension Array {
 
         map a function over each value inside self and flatten the result
 
-        :param: f A transformation function from type T to an array of type [U]
+        :param: f A transformation function from type T to type [U]
 
-        :returns: An array of type [U]
+        :returns: A value of type [U]
     */
     func flatMap<U>(f: T -> [U]) -> [U] {
         return reduce([]) { bs, a in bs + f(a) }

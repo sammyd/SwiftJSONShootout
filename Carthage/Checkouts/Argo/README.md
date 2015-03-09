@@ -5,6 +5,12 @@ The Greek word for _swift_ and the ship used by Jason, son of Aeson, of the
 Argonauts. Aeson is the JSON parsing library in Haskell that inspired Argo,
 much like Aeson inspired his son Jason.
 
+NOTE: The master branch of Argo is pushing ahead with Swift 1.2 support.
+Support for Swift 1.1 can be found on branch [swift-1.1] and in the 0.3.x
+versions of tags/releases.
+
+[swift-1.1]: https://github.com/thoughtbot/Argo/tree/swift-1.1
+
 ## Installation
 
 ### [Carthage]
@@ -24,8 +30,7 @@ for up to date installation instructions.
 
 [carthage-installation]: https://github.com/Carthage/Carthage#adding-frameworks-to-an-application
 
-If you want to use the functional operators (`<^>`, `<*>`, `>>-`) in your app,
-you'll also need to add `Runes.framework` to your project. [Runes] is a
+You'll also need to add `Runes.framework` to your project. [Runes] is a
 dependency of Argo, so you don't need to specify it in your Cartfile.
 
 [Runes]: https://github.com/thoughtbot/runes
@@ -51,6 +56,8 @@ I guess you could do it this way if that's your thing.
 
 Add this repo as a submodule, and add the project file to your workspace. You
 can then link against `Argo.framework` for your application target.
+
+You'll also need to add [Runes] to your project the same way.
 
 ## Usage tl;dr:
 
@@ -85,9 +92,8 @@ extension User: JSONDecodable {
 let json: AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: .None)
 
 if let j: AnyObject = json {
-  if let value = JSONValue.parse(j) {
-    let user = User.decode(value)
-  }
+  let value = JSONValue.parse(j)
+  let user = User.decode(value)
 }
 ```
 
@@ -161,9 +167,8 @@ value returned from `NSJSONSerialization` to `JSONValue.parse()`:
 let json: AnyObject? = NSJSONSerialization.JSONObjectWithData(responseData, options: NSJSONReadingOptions(0), error: nil)
 
 if let j: AnyObject = json {
-  if let value: JSONValue = JSONValue.parse(j) {
-    let user: User? = User.decode(value)
-  }
+  let value: JSONValue = JSONValue.parse(j)
+  let user: User? = User.decode(value)
 }
 ```
 

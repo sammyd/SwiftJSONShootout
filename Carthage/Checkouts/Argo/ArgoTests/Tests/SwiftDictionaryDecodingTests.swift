@@ -1,11 +1,27 @@
 import XCTest
 import Argo
-import Runes
 
-class TypeTests: XCTestCase {
-  func testAllTheTypes() {
-    let json = JSON.parse <^> JSONFileReader.JSON(fromFile: "types")
-    let model = json >>- TestModel.decode
+class SwiftDictionaryDecodingTests: XCTestCase {
+  func testDecodingAllTypesFromSwiftDictionary() {
+    let typesDict = [
+      "int": 5,
+      "double": 3.4,
+      "float": 1.1,
+      "bool": false,
+      "int_opt": 4,
+      "string_array": ["hello", "world"],
+      "embedded": [
+        "string_array": ["hello", "world"],
+        "string_array_opt": []
+      ],
+      "user_opt": [
+        "id": 6,
+        "name": "Cooler User"
+      ]
+    ]
+
+    let value = JSON.parse(typesDict)
+    let model = TestModel.decode(value)
 
     XCTAssert(model != nil)
     XCTAssert(model?.int == 5)
@@ -22,12 +38,5 @@ class TypeTests: XCTestCase {
     XCTAssert(model?.eStringArrayOpt?.count == 0)
     XCTAssert(model?.userOpt != nil)
     XCTAssert(model?.userOpt?.id == 6)
-  }
-
-  func testFailingEmbedded() {
-    let json = JSON.parse <^> JSONFileReader.JSON(fromFile: "types_fail_embedded")
-    let model = json >>- TestModel.decode
-
-    XCTAssert(model == nil)
   }
 }
