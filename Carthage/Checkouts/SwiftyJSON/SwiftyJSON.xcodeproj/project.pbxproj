@@ -420,6 +420,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info-OSX.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = SwiftyJSON;
 				SDKROOT = macosx;
@@ -441,6 +442,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info-OSX.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = SwiftyJSON;
 				SDKROOT = macosx;
@@ -651,6 +653,7 @@
 				030B6CD81A6E16E900C2D4F1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		030B6CD91A6E16E900C2D4F1 /* Build configuration list for PBXNativeTarget "SwiftyJSON OSXTests" */ = {
 			isa = XCConfigurationList;
@@ -659,6 +662,7 @@
 				030B6CDB1A6E16E900C2D4F1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		2E4FEFD519575BE100351305 /* Build configuration list for PBXProject "SwiftyJSON" */ = {
 			isa = XCConfigurationList;
